@@ -95,7 +95,7 @@ npm run dev
 
 เปิด `http://127.0.0.1:5173` (หน้าเว็บ) หรือ `http://localhost:5173`; API ใช้พอร์ต `3001` โดยค่าเริ่มต้น **ไม่ต้อง** เปลี่ยน path ในคำสั่งตามตำแหน่งโฟลเดอร์ของคนเขียน README โหมดเดโมสร้างฐานข้อมูลใน `data/routhun.db` และคีย์ไฟล์ตัวอย่างใน `data/`; โฟลเดอร์นี้ถูก ignore จาก Git
 
-**บัญชีเดโมของมูลนิธิแสงใหม่:** `admin@demo.routhun.test`, `staff@demo.routhun.test`, `board1@demo.routhun.test`, `board2@demo.routhun.test`, `auditor@demo.routhun.test` ใช้รหัส `RouthunDemo2027!` เหมือนกัน **ห้ามเปิดบริการเดโมนี้บนอินเทอร์เน็ต**
+**บัญชีเดโมของมูลนิธิแสงใหม่:** `admin@demo.routhun.test`, `staff@demo.routhun.test`, `board1@demo.routhun.test`, `board2@demo.routhun.test`, `auditor@demo.routhun.test` ใช้รหัส `RouthunDemo2027!` เหมือนกัน **ห้ามเปิดโหมด local API/ฐานข้อมูลเดโมนี้บนอินเทอร์เน็ต**; สำหรับการเผยแพร่ตัวอย่างให้ใช้โหมด static read-only ด้านล่างเท่านั้น
 
 ### ลองติดตามเงินบริจาค
 
@@ -121,7 +121,10 @@ node server/verify-proof.mjs path/to/proof.json
 ```bash
 npm test
 npm run build
+npm run build:demo
 ```
+
+`npm run build:demo` สร้างข้อมูลสมมติจากฐานในหน่วยความจำ แล้วประกอบเป็นเว็บ static สำหรับเผยแพร่เดโม; `npm run build` สร้าง frontend สำหรับเชื่อม backend โดยไม่คัดลอกไฟล์ข้อมูลเดโมติดไปด้วย
 
 `npm run test:e2e` ใช้ Playwright โดยสคริปต์ปัจจุบันระบุ path **Microsoft Edge บน Windows** และคาดว่า dev server รันอยู่ที่ `127.0.0.1:5173`/`3001`; ไม่ใช่คำสั่ง portable สำหรับทุกเครื่องโดยไม่แก้สคริปต์ Test suite ครอบคลุมสิทธิ์ บัญชีคู่ การจับคู่ธนาคาร การจัดสรร proof ความเป็นส่วนตัว และกรณีตัวอย่าง
 
@@ -136,13 +139,17 @@ npm run build
 | [`server/crypto.mjs`](server/crypto.mjs), [`src/verify.js`](src/verify.js) | SHA-256, Merkle proof และตัวตรวจฝั่งเบราว์เซอร์ |
 | [`server/chain.mjs`](server/chain.mjs), [`contracts/RouthunAnchor.sol`](contracts/RouthunAnchor.sol) | adapter สำหรับ Ethereum และสัญญายึด root (ยังไม่ deploy) |
 | [`server/tests/`](server/tests/), [`scripts/`](scripts/) | การทดสอบ API/ข้อมูลสมมติ และ browser E2E |
-| [`DEPLOYMENT.md`](DEPLOYMENT.md), [`vercel.mjs`](vercel.mjs) | แนวทางแยก frontend บน Vercel กับ backend ที่มีข้อมูลถาวร |
+| [`DEPLOYMENT.md`](DEPLOYMENT.md), [`vercel.mjs`](vercel.mjs) | วิธีขึ้น static demo แบบไม่ใช้ backend และทางเลือก frontend + backend ถาวรในอนาคต |
 
 ยอดเงินในฐานข้อมูลเก็บเป็น **สตางค์จำนวนเต็ม**. ไฟล์หลักฐานที่อัปโหลดผ่านขั้นตอนปกติถูกเข้ารหัส AES-256-GCM; **รายจ่ายที่ seed สำหรับเดโมหลายกรณีไม่มีไฟล์หลักฐานจริง** จึงห้ามอ้างว่าเป็นใบเสร็จที่ตรวจได้
 
-## เตรียมนำขึ้น Vercel ≠ พร้อมเปิดรับเงินจริง
+## ขึ้นเว็บเดโมบน Vercel ≠ พร้อมเปิดรับเงินจริง
 
-[`vercel.mjs`](vercel.mjs) เตรียม build หน้า Vite ลง `dist/` และ rewrite `/api/*` ไปยัง **Express backend ที่โฮสต์แยกบนระบบที่มี storage ถาวร** ต้องกำหนด `BACKEND_ORIGIN` (HTTPS) บน Vercel และ `PUBLIC_ORIGIN` (โดเมนหน้าเว็บ) บน backend อ่านขั้นตอนใน [`DEPLOYMENT.md`](DEPLOYMENT.md) โครงการ **ยังไม่ได้ deploy**; SQLite/ไฟล์หลักฐานไม่ควรไปอยู่บนดิสก์ชั่วคราวของ Vercel Functions
+**เมื่อยังไม่มี backend:** [`vercel.mjs`](vercel.mjs) เลือก `npm run build:demo` โดยอัตโนมัติหากไม่ได้ตั้ง `BACKEND_ORIGIN` ทำให้ Vercel เสิร์ฟเว็บ static พร้อมข้อมูลสมมติเท่านั้น หน้าเว็บ **ยังล็อกอินเพื่อสลับดู 5 บทบาทตัวอย่างได้** และเรียกดูมูลนิธิ/เคสตัวอย่างได้ แต่เป็นการเลือกบทบาทใน `sessionStorage` ของเบราว์เซอร์ **ไม่ใช่การยืนยันตัวตนหรือการรักษาความลับ** ข้อมูลทุกบทบาทในเดโมนี้เป็นข้อมูลสมมติที่ใครก็เปิดอ่านได้ ไม่มี API รับข้อมูลจริง ไม่มีการบันทึกเงินเข้า จัดสรร อนุมัติ หรือออกรหัสติดตาม ผู้เข้าชมไม่ควรกรอกสลิปหรือข้อมูลส่วนตัวลงในเว็บเดโม
+
+หาก Vercel project มี Build Command ที่ override ไว้ ให้ใช้ `npm run build:demo` หรือปล่อยให้ `vercel.mjs` กำหนดเอง; ต้อง push โค้ดใหม่แล้ว redeploy ก่อนจึงเห็นการเปลี่ยนแปลง วิธีตรวจในเบราว์เซอร์: รัน `npm run build:demo`, `npx vite preview --host 127.0.0.1 --port 4173` แล้วรัน `npm run test:demo:e2e` ในอีก terminal (ทดสอบด้วย Edge บน Windows) **โครงการยังไม่ได้ยืนยันว่า deploy บน Vercel สำเร็จ**
+
+**เมื่อมี backend ภายหลัง:** กำหนด `BACKEND_ORIGIN` เป็น HTTPS origin ของ Express API ที่มีฐานข้อมูล/ไฟล์ถาวร `vercel.mjs` จะใช้ `npm run build` และ rewrite `/api/*` ไปยัง backend; ตั้ง `PUBLIC_ORIGIN` ของ backend ให้ตรงกับโดเมนหน้าเว็บด้วย อ่านขั้นตอนและข้อควรระวังใน [`DEPLOYMENT.md`](DEPLOYMENT.md) อย่านำ SQLite/ไฟล์หลักฐานไปวางบนดิสก์ชั่วคราวของ Vercel Functions
 
 ก่อนใช้เงินจริงยังต้องมีอย่างน้อย:
 

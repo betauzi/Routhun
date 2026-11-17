@@ -2,6 +2,7 @@ node_modules/
 dist/
 data/
 artifacts/
+public/demo-data.json
 .env
 *.db
 *.db-shm

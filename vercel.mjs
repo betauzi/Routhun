@@ -1,7 +1,7 @@
 // Vercel hosts the Vite frontend; the stateful API must live on a persistent host.
 // Vercel reads this dynamic configuration before the build.
 const origin = process.env.BACKEND_ORIGIN;
-if (process.env.VERCEL && !origin) throw new Error('Set BACKEND_ORIGIN to the HTTPS URL of the persistent API before deploying.');
+// A missing API selects a clearly labelled, read-only showcase instead of a broken proxy.
 if (origin) {
   const backend = new URL(origin);
   if (backend.protocol !== 'https:' || backend.pathname !== '/' || backend.search || backend.hash || backend.username || backend.password)
@@ -9,7 +9,7 @@ if (origin) {
 }
 export const config = {
   framework: 'vite',
-  buildCommand: 'npm run build',
+  buildCommand: origin ? 'npm run build' : 'npm run build:demo',
   outputDirectory: 'dist',
   rewrites: [
     ...(origin ? [{ source: '/api/:path*', destination: `${origin}/api/:path*` }] : []),

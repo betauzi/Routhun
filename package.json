@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "concurrently -k \"node --watch server/start.mjs\" \"vite --host 127.0.0.1\"",
     "start": "cross-env NODE_ENV=production node server/start.mjs",
-    "build": "vite build",
+    "build": "cross-env VITE_STATIC_DEMO=false vite build",
+    "build:demo": "node scripts/generate-static-demo.mjs && cross-env VITE_STATIC_DEMO=true vite build",
+    "test:demo:e2e": "node scripts/static-demo-e2e.mjs",
     "test": "node --test server/tests/*.test.mjs",
     "test:e2e": "node scripts/e2e.mjs",
     "bootstrap": "node server/bootstrap.mjs"
