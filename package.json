@@ -1,0 +1,28 @@
+{
+  "name": "routhun",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "concurrently -k \"node --watch server/start.mjs\" \"vite --host 127.0.0.1\"",
+    "start": "cross-env NODE_ENV=production node server/start.mjs",
+    "build": "vite build",
+    "test": "node --test server/tests/*.test.mjs",
+    "test:e2e": "node scripts/e2e.mjs",
+    "bootstrap": "node server/bootstrap.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "lucide-react": "^0.468.0",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "viem": "^2.40.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.0",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
+    "playwright-core": "^1.65.1",
+    "vite": "^7.1.0"
+  }
+}

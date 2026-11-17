@@ -1,0 +1,13 @@
+/* Final legibility and narrow-viewport pass. */
+@media(min-width:1181px){.app-shell{background:linear-gradient(to right,#12342c 264px,#f5f7f4 264px)}}
+@media(min-width:761px) and (max-width:1180px){.app-shell{background:linear-gradient(to right,#12342c 230px,#f5f7f4 230px)}}
+:root{--muted:#586e64}
+.icon-only,.mobile-menu{min-width:44px;min-height:44px}
+.row-link{min-height:44px}
+.sidebar nav{min-height:0;overflow-y:auto;overflow-x:hidden;flex:1;align-content:start;scrollbar-width:thin}
+.sidebar-bottom{flex:none}
+@media(max-width:760px){.sidebar{height:100dvh;max-height:100dvh;overflow:hidden}}
+.public-result code{display:block;overflow-wrap:anywhere;line-height:1.7;margin:14px 0 18px}
+.public-result .button{margin-top:4px}
+.public-hero .public-demo-warning{display:inline-block;margin:8px 0 14px;padding:7px 12px;border:1px solid #dbbc7a;background:#f7e9c6;color:#4f391a;border-radius:7px;font-size:13px;font-weight:700}
+@media(max-width:760px){.topbar .environment{display:none}.topbar .breadcrumb{max-width:150px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.top-actions{gap:4px}.demo-strip{font-size:12px;line-height:1.55}.activity small,.expense-meta,.footnote{font-size:12px;line-height:1.65}}

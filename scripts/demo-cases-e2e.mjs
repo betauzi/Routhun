@@ -1,0 +1,36 @@
+import { chromium } from 'playwright-core';
+import assert from 'node:assert/strict';
+import { resolve } from 'node:path';
+import { mkdirSync } from 'node:fs';
+const executablePath=process.env.EDGE_PATH||'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe';
+const base=process.env.WEB_URL||'http://127.0.0.1:5173';
+const artifacts=resolve('artifacts');mkdirSync(artifacts,{recursive:true});
+const browser=await chromium.launch({headless:true,executablePath,args:['--no-sandbox']});
+try {
+ const page=await browser.newPage({viewport:{width:1365,height:900}});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto(base+'/public');
+ await page.getByRole('heading',{name:'เลือกมูลนิธิ'}).waitFor();
+ assert.ok(await page.locator('.foundation-card').count()>=19);
+ await page.getByPlaceholder('ค้นหาชื่อมูลนิธิ').fill('บ้านอุ่นใจ');
+ assert.equal(await page.locator('.foundation-card').count(),1);
+ await page.locator('.foundation-card').getByRole('button',{name:'ดูข้อมูล'}).click();
+ await page.getByRole('heading',{name:'มูลนิธิบ้านอุ่นใจ (สมมติ)'}).waitFor();
+ assert.match(page.url(),/\/public\/baan-oon$/);
+ await page.getByRole('button',{name:/ติดตามเงินบริจาคของฉัน/}).click();
+ await page.getByRole('heading',{name:'ติดตามเงินที่ฉันบริจาค'}).waitFor();
+ assert.match(page.url(),/\/track\/baan-oon$/);
+ assert.equal(await page.getByLabel('มูลนิธิที่คุณโอนให้').inputValue(),'baan-oon');
+ await page.getByRole('heading',{name:'เคสตัวอย่างสำหรับลองดู'}).waitFor();
+ assert.equal(await page.locator('.demo-case').count(),3);
+ await page.locator('.demo-case').filter({hasText:'จัดสรรครบและมีรายจ่ายอนุมัติ'}).getByRole('button',{name:'ดูตัวอย่าง'}).click();
+ await page.getByText('ตัวอย่างจำลอง ไม่ใช่เงินของคุณ').waitFor();
+ await page.getByText('จัดสรรครบตามข้อมูลในระบบ').waitFor();
+ await page.getByText('รายจ่ายรวมที่บันทึกและอนุมัติในโครงการ: ฿60.00').waitFor();
+ await page.screenshot({path:resolve(artifacts,'demo-cases-desktop.png'),fullPage:true});
+ await page.getByLabel('มูลนิธิที่คุณโอนให้').selectOption('dek-wan');
+ await page.locator('.demo-case').filter({hasText:'จัดสรรบางส่วนและรายจ่ายรออนุมัติ'}).getByRole('button',{name:'ดูตัวอย่าง'}).click();
+ await page.getByText('รายจ่ายรวมที่บันทึกและอนุมัติในโครงการ: ฿0.00').waitFor();
+ assert.deepEqual(errors,[]);
+ console.log(JSON.stringify({passed:true,foundations:await page.locator('select option').count(),cases:3,checks:['directory','search','public navigation','foundation-aware tracking','repeatable case previews','approved vs pending expenses'],browserErrors:errors},null,2));
+} finally {await browser.close();}
